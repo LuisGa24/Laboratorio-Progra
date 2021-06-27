@@ -20,6 +20,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
@@ -40,8 +41,6 @@ public class MainMenuController implements Initializable {
     @FXML
     private Button btnAddAccount;
     @FXML
-    private Button btnAccounts;
-    @FXML
     private Button btnClients;
     @FXML
     private Text txt1;
@@ -52,12 +51,6 @@ public class MainMenuController implements Initializable {
     @FXML
     private Text txt4;
     @FXML
-    private Text txt5;
-    @FXML
-    private Text txt6;
-    @FXML
-    private Text txt7;
-    @FXML
     private TextField txf1;
     @FXML
     private TextField txf2;
@@ -66,16 +59,10 @@ public class MainMenuController implements Initializable {
     @FXML
     private TextField txf4;
     @FXML
-    private TextField txf5;
-    @FXML
-    private TextField txf6;
-    @FXML
-    private TextField txf7;
-    @FXML
     private Text txtTitle;
     @FXML
     private Button btnAddClient;
-    
+
     clientMaintenance cm;
     accountMaintenance am;
     @FXML
@@ -92,6 +79,10 @@ public class MainMenuController implements Initializable {
     private RadioButton rdbTerm;
     @FXML
     private Button btnSaveAccount;
+    @FXML
+    private Text txtClientIdLabel;
+    @FXML
+    private Text txtInfo;
 
     /**
      * Initializes the controller class.
@@ -101,38 +92,49 @@ public class MainMenuController implements Initializable {
         clean();
         cm = new clientMaintenance();
         am = new accountMaintenance();
-    }    
+    }
 
     @FXML
     private void btnDisplayClientData(ActionEvent event) {
+        clean();
+        this.txfClientId.setText("");
+        this.txtClientIdLabel.setVisible(true);
+        this.txfClientId.setVisible(true);
+        this.btnSearch.setVisible(true);
+
     }
 
     @FXML
     private void btnAddAccount(ActionEvent event) {
-        
+        clean();
+        this.btnSearch.setVisible(true);
+        this.txtClientIdLabel.setVisible(true);
+        this.txfClientId.setText("");
+        this.txfClientId.setVisible(true);
+        this.txtTitle.setText("Añadir cuenta");
         rdbSavings.setVisible(true);
         rdbTerm.setVisible(true);
-        
-    }
-
-    @FXML
-    private void btnAccounts(ActionEvent event) {
     }
 
     @FXML
     private void btnClients(ActionEvent event) {
-        txt1.setText("Cédula");
+        clean();
+        this.txtTitle.setText("Mantenimiento de cliente");
+        this.btnAddClient.setVisible(true);
+        this.txf1.setText("");
+        this.txf2.setText("");
+        this.txf3.setText("");
+        txt1.setText("Cédula:");
         txf1.setVisible(true);
-        txt2.setText("Nombre");
+        txt2.setText("Nombre:");
         txf2.setVisible(true);
-        txt3.setText("Teléfono");
+        txt3.setText("Teléfono:");
         txf3.setVisible(true);
-        txt4.setText("Dirección");
+        txt4.setText("Dirección:");
         txf4.setVisible(true);
     }
-    
-    public void clean(){
-    
+
+    public void clean() {
         txt1.setText("");
         txf1.setVisible(false);
         txt2.setText("");
@@ -141,23 +143,50 @@ public class MainMenuController implements Initializable {
         txf3.setVisible(false);
         txt4.setText("");
         txf4.setVisible(false);
-        txt5.setText("");
-        txf5.setVisible(false);
-        txt6.setText("");
-        txf6.setVisible(false);
-        txt7.setText("");
-        txf7.setVisible(false);
-    
+        this.txfClientId.setVisible(false);
+
+        this.rdbSavings.setSelected(false);
+        this.rdbTerm.setSelected(false);
+
+        this.txtClientAccounts.setText("");
+        this.txtClientData.setText("");
+        this.txtTitle.setText("");
+        this.txtClientIdLabel.setVisible(false);
+
+        this.btnAddClient.setVisible(false);
+        this.btnSaveAccount.setVisible(false);
+        this.btnSearch.setVisible(false);
+
+        this.rdbSavings.setVisible(false);
+        this.rdbTerm.setVisible(false);
+
+        this.listAccounts.setVisible(false);
+        this.listAccounts.getItems().clear();
+
+        this.txtInfo.setText("");
     }
 
     @FXML
     private void btnAddClient(ActionEvent event) {
-        cm.addClient(new Client(txf1.getText(), txf2.getText(), txf3.getText(), txf4.getText()));
+        if (txf1.getText().equals("") || txf2.getText().equals("") || txf3.getText().equals("") || txf4.getText().equals("")) {
+            alertCreator("Datos incompletos", "Complete los espacios solicitados", "error");
+        } else {
+            if (cm.addClient(new Client(txf1.getText(), txf2.getText(), txf3.getText(), txf4.getText()))) {
+                alertCreator("Cliente añadido", "El cliente ha sido añadido exitosamente", "confirmation");
+                this.txf1.setText("");
+                this.txf2.setText("");
+                this.txf3.setText("");
+                this.txf4.setText("");
+            } else {
+                alertCreator("Cliente no añadido", "El cliente no ha podido ser añadido", "error");
+            }
+        }
+
     }
 
     @FXML
     private void btnSearch(ActionEvent event) {
-        clean();
+        this.txtInfo.setText("");
         if (cm.existClient(txfClientId.getText())) {
 
             txtClientData.setText(cm.getClient(txfClientId.getText()).toString());
@@ -173,16 +202,19 @@ public class MainMenuController implements Initializable {
                 }
 
                 listAccounts.setItems(oL);
-
+                if (!this.txtTitle.getText().equals("Añadir cuenta")) {
+                    this.listAccounts.setVisible(true);
+                    txtClientAccounts.setText("Cuentas del cliente");
+                }
             } else {
-
-                System.out.println("El cliente no tiene cuentas registradas.");
-
+                if (!this.txtTitle.getText().equals("Añadir cuenta")) {
+                    this.txtClientAccounts.setText("El cliente no tiene cuentas registradas.");
+                }
             }
 
         } else {
 
-            txtClientData.setText("El Cliente buscado no existe.");
+            txtClientData.setText("El cliente buscado no existe.");
 
         }
 
@@ -190,46 +222,103 @@ public class MainMenuController implements Initializable {
 
     @FXML
     private void rdbSavings(ActionEvent event) {
-        txt1.setText("Tipo de moneda: (\'D\', \'C\', \'E\'...)");
-        txf1.setVisible(true);
-        txt2.setText("Deposito inicial: ");
-        txf2.setVisible(true);
-        txt3.setText("Tasa de interes: ");
-        txf3.setVisible(true);
-        rdbSavings.setSelected(true);
-        rdbTerm.setSelected(false);
-        
+        this.listAccounts.setVisible(false);
+        txtClientAccounts.setText("");
+        this.txf4.setVisible(false);
+        this.txt4.setText("");
+        if (this.txtClientData.getText().equals("") || this.txtClientData.getText().equals("El cliente buscado no existe.")) {
+            rdbSavings.setSelected(false);
+            rdbTerm.setSelected(false);
+            this.txtInfo.setText("Debe buscar un cliente válido");
+        } else {
+            this.rdbSavings.setVisible(true);
+            this.rdbTerm.setVisible(true);
+            this.btnSaveAccount.setVisible(true);
+            txt1.setText("Tipo de moneda: (D|C|E)");
+            txf1.setVisible(true);
+            txt2.setText("Depósito inicial: ");
+            txf2.setVisible(true);
+            txt3.setText("Tasa de interés: ");
+            txf3.setVisible(true);
+            rdbSavings.setSelected(true);
+            rdbTerm.setSelected(false);
+        }
     }
 
     @FXML
     private void rdbTerm(ActionEvent event) {
-        txt1.setText("Tipo de moneda: (\'D\', \'C\', \'E\'...)");
-        txf1.setVisible(true);
-        txt2.setText("Deposito inicial: ");
-        txf2.setVisible(true);
-        txt3.setText("Tasa de interes: ");
-        txf3.setVisible(true);
-        txt4.setText("Plazo : (Cantidad de meses)");
-        txf4.setVisible(true);
-        rdbSavings.setSelected(false);
-        rdbTerm.setSelected(true);
+        this.listAccounts.setVisible(false);
+        txtClientAccounts.setText("");
+        if (this.txtClientData.getText().equals("") || this.txtClientData.getText().equals("El cliente buscado no existe.")) {
+            rdbSavings.setSelected(false);
+            rdbTerm.setSelected(true);
+            this.txtInfo.setText("Debe buscar un cliente válido");
+        } else {
+            this.rdbSavings.setVisible(true);
+            this.rdbTerm.setVisible(true);
+            this.btnSaveAccount.setVisible(true);
+            txt1.setText("Tipo de moneda: (D|C|E)");
+            txf1.setVisible(true);
+            txt2.setText("Depósito inicial: ");
+            txf2.setVisible(true);
+            txt3.setText("Tasa de interés: ");
+            txf3.setVisible(true);
+            txt4.setText("Plazo : (Meses)");
+            txf4.setVisible(true);
+            rdbSavings.setSelected(false);
+            rdbTerm.setSelected(true);
+        }
     }
 
     @FXML
     private void btnSaveAccount(ActionEvent event) {
-        try{
-        if(rdbSavings.isSelected()){
-            java.util.Date d = java.sql.Date.valueOf(java.time.LocalDate.now());
-            am.addAccount(new SavingsAccount(txf1.getText().charAt(0), d, Float.parseFloat(txf2.getText()), txfClientId.getText(), Float.parseFloat(txf3.getText())));
-        }else{
-            java.util.Date d = java.sql.Date.valueOf(java.time.LocalDate.now());
-            am.addAccount(new TermAccount(txf1.getText().charAt(0), d,txfClientId.getText() ,Float.parseFloat(txf2.getText()), Float.parseFloat(txf3.getText()), Integer.parseInt(txf4.getText())));
+        try {
+            if (rdbSavings.isSelected()) {
+                java.util.Date d = java.sql.Date.valueOf(java.time.LocalDate.now());
+                if (txf1.getText().equals("") || txf2.getText().equals("") || txf3.getText().equals("")) {
+                    alertCreator("Datos incompletos", "Complete los datos solicitados", "error");
+                } else {
+                    if (am.addAccount(new SavingsAccount(txf1.getText().charAt(0), d, Float.parseFloat(txf2.getText()), txfClientId.getText(), Float.parseFloat(txf3.getText())))) {
+                        alertCreator("Cuenta añadida", "La cuenta ha sido añadida al cliente seleccionado ", "confirmation");
+                        btnAddAccount(event);
+                    } else {
+                        alertCreator("Cuenta no añadida", "La cuenta no ha sido añadida al cliente seleccionado ", "error");
+                    }
+                }
+            } else {
+                java.util.Date d = java.sql.Date.valueOf(java.time.LocalDate.now());
+                if (txf1.getText().equals("") || txf2.getText().equals("") || txf3.getText().equals("") || txf4.getText().equals("")) {
+                    alertCreator("Datos incompletos", "Complete los datos solicitados", "error");
+                } else {
+                    if (am.addAccount(new TermAccount(txf1.getText().charAt(0), d, txfClientId.getText(), Float.parseFloat(txf2.getText()), Float.parseFloat(txf3.getText()), Integer.parseInt(txf4.getText())))) {
+                        alertCreator("Cuenta añadida", "La cuenta ha sido añadida al cliente seleccionado ", "confirmation");
+                        btnAddAccount(event);
+                    } else {
+                        alertCreator("Cuenta no añadida", "La cuenta no ha sido añadida al cliente seleccionado ", "error");
+                    }
+                }
+            }
+        } catch (NumberFormatException e) {
+            alertCreator("Datos incorrectos", "Revise la información proporcionada", "error");
         }
-        }catch(Exception e){
-            System.out.println("Datos incorrectos");
-        }
-                
-                
+
     }
-    
+
+    public void alertCreator(String title, String content, String type) {
+        if (type.equals("confirmation")) {
+            Alert alerta = new Alert(Alert.AlertType.INFORMATION);
+            alerta.setTitle(type);
+            alerta.setContentText(content);
+            alerta.setHeaderText(title);
+            alerta.showAndWait();
+        }
+        if (type.equals("error")) {
+            Alert alerta = new Alert(Alert.AlertType.ERROR);
+            alerta.setTitle(type);
+            alerta.setContentText(content);
+            alerta.setHeaderText(title);
+            alerta.showAndWait();
+        }
+    }
+
 }

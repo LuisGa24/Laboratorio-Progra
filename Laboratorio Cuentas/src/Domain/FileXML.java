@@ -218,8 +218,8 @@ public class FileXML {
                     ta = new TermAccount(
                             eElement.getElementsByTagName("currency").item(0).getTextContent().charAt(0),
                             date,
-                            eElement.getElementsByTagName("clientId").item(0).getTextContent(),
-                            Float.parseFloat(eElement.getElementsByTagName("amount").item(0).getTextContent()),
+                            eElement.getElementsByTagName("clientID").item(0).getTextContent(),
+                            Float.parseFloat(eElement.getElementsByTagName("startingAmount").item(0).getTextContent()),
                             Float.parseFloat(eElement.getElementsByTagName("interestRate").item(0).getTextContent()),
                             Integer.parseInt(eElement.getElementsByTagName("term").item(0).getTextContent())
                     );

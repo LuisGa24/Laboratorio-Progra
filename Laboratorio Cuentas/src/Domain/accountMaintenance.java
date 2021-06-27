@@ -17,54 +17,57 @@ import org.xml.sax.SAXException;
  * @author LuisGa
  */
 public class accountMaintenance {
-     LinkedList<Account> accountList;
+
+    LinkedList<Account> accountList;
 
     public accountMaintenance() {
         accountList = new LinkedList<>();
         loadAccounts();
     }
-    
-    public void addAccount(Account a){
-    accountList.add(a);
-    saveAccounts();
 
+    public boolean addAccount(Account a) {
+        if (accountList.add(a)) {
+            saveAccounts();
+            return true;
+        }
+        return false;
     }
-    
-    public LinkedList<Account> getAccountsByClientId(String clientId){
+
+    public LinkedList<Account> getAccountsByClientId(String clientId) {
         LinkedList<Account> clientAccounts = new LinkedList<>();
-        
+
         for (int i = 0; i < accountList.size(); i++) {
             if (accountList.get(i).getClientId().equalsIgnoreCase(clientId)) {
                 clientAccounts.add(accountList.get(i));
             }
         }
-    return clientAccounts;
+        return clientAccounts;
     }
-    
-    public boolean existAccount(int id){
-       
+
+    public boolean existAccount(int id) {
+
         for (int i = 0; i < accountList.size(); i++) {
-            if (accountList.get(i).getId()==id) {
+            if (accountList.get(i).getId() == id) {
                 return true;
             }
         }
-    return false;
+        return false;
     }
-    
-    public Account deleteAccount(int id){
-        
-        Account a=null;
-        
+
+    public Account deleteAccount(int id) {
+
+        Account a = null;
+
         for (int i = 0; i < accountList.size(); i++) {
-            if (accountList.get(i).getId()==id) {
-                a=accountList.get(i);
+            if (accountList.get(i).getId() == id) {
+                a = accountList.get(i);
                 accountList.remove(i);
             }
         }
-    saveAccounts();
-    return a;
+        saveAccounts();
+        return a;
     }
-    
+
     public void saveAccounts() {
         FileXML fXML = new FileXML();
 
@@ -73,22 +76,20 @@ public class accountMaintenance {
             if (!accountList.isEmpty()) {
 //                writeAccounts();
             }
-        }
-            else {
+        } else {
             fXML.deleteFile("SavingsAccount");
             fXML.createXML("SavingsAccountXML", "SavingsAccount");
             if (!accountList.isEmpty()) {
 //                writeAccounts();
             }
         }
-        
+
         if (!fXML.exist("TermAccount.xml")) { //Si el archivo no existe
             fXML.createXML("TermAccountXML", "TermAccount");
             if (!accountList.isEmpty()) {
                 writeAccounts();
             }
-        }
-            else {
+        } else {
             fXML.deleteFile("TermAccount");
             fXML.createXML("TermAccountXML", "TermAccount");
             if (!accountList.isEmpty()) {
@@ -96,7 +97,7 @@ public class accountMaintenance {
             }
         }
     }
-    
+
     public void writeAccounts() {
 
         FileXML fXML = new FileXML();
@@ -111,53 +112,53 @@ public class accountMaintenance {
         } else {
 
             for (int i = 0; i < accountList.size(); i++) {
-            
-                if(accountList.get(i) instanceof SavingsAccount){
-            
-                SavingsAccount a =(SavingsAccount) accountList.get(i);
-                try {
 
-                    fXML.writeXML("SavingsAccount.xml", "SavingsAccount", a.dataName(), a.data());
-                } catch (TransformerException ex) {
-                    Logger.getLogger(clientMaintenance.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SAXException ex) {
-                    Logger.getLogger(clientMaintenance.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(clientMaintenance.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
-                }else{
-                
-                TermAccount a =(TermAccount) accountList.get(i);
-                try {
+                if (accountList.get(i) instanceof SavingsAccount) {
 
-                    fXML.writeXML("TermAccount.xml", "TermAccount", a.dataName(), a.data());
-                } catch (TransformerException ex) {
-                    Logger.getLogger(clientMaintenance.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (SAXException ex) {
-                    Logger.getLogger(clientMaintenance.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (IOException ex) {
-                    Logger.getLogger(clientMaintenance.class.getName()).log(Level.SEVERE, null, ex);
+                    SavingsAccount a = (SavingsAccount) accountList.get(i);
+                    try {
+
+                        fXML.writeXML("SavingsAccount.xml", "SavingsAccount", a.dataName(), a.data());
+                    } catch (TransformerException ex) {
+                        Logger.getLogger(clientMaintenance.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (SAXException ex) {
+                        Logger.getLogger(clientMaintenance.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        Logger.getLogger(clientMaintenance.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+
+                } else {
+
+                    TermAccount a = (TermAccount) accountList.get(i);
+                    try {
+
+                        fXML.writeXML("TermAccount.xml", "TermAccount", a.dataName(), a.data());
+                    } catch (TransformerException ex) {
+                        Logger.getLogger(clientMaintenance.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (SAXException ex) {
+                        Logger.getLogger(clientMaintenance.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (IOException ex) {
+                        Logger.getLogger(clientMaintenance.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
+
             }
-        
-            }
-            }
+        }
     }
-    
+
     public void loadAccounts() {
         //Se encarga de rellenar las listas desde los XML
         //Se rellena la lista de estudiantes segun el xml Students.xml
         FileXML fXML = new FileXML();
         if (fXML.exist("SavingsAccount.xml")) {
-           
+
             accountList = fXML.readXMLtoSAccountList("SavingsAccount");
 
         }
         if (fXML.exist("TermAccount.xml")) {
-           
+
             LinkedList<Account> termAccountList = fXML.readXMLtoTAccountList("TermAccount");
-            for (int i = 0; i <termAccountList.size(); i++) {
+            for (int i = 0; i < termAccountList.size(); i++) {
                 accountList.add(termAccountList.get(i));
             }
 

@@ -44,7 +44,7 @@ public final class TermAccount extends Account {
 
     public String[] data() {
         
-        String[] data = {String.valueOf(super.getId()), String.valueOf(super.getCurrency()), super.getOpeningDate().toString(), super.getClientId(), String.valueOf(interestRate), String.valueOf(startingAmount),String.valueOf(term)};
+        String[] data = {String.valueOf(super.getId()), String.valueOf(super.getCurrency()), new SimpleDateFormat("dd-MM-yyyy").format(super.getOpeningDate()), super.getClientId(), String.valueOf(interestRate), String.valueOf(startingAmount),String.valueOf(term)};
         return data;
     }
 
